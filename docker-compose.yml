@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    environment:
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "ELASTIC_PASSWORD=${ELASTIC_PASSWORD}"
+    volumes:
+      - /opt/data/elk/elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+#      - ./elasticsearch/config/elasticsearch.keystore:/usr/share/elasticsearch/config/elasticsearch.keystore
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elk
+    restart: always
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    volumes:
+      - /opt/data/elk/kibana/data:/usr/share/kibana/data
+#      - /opt/data/elk/kibana/node:/usr/share/kibana/node:rw
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    restart: always
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx8g -Xms8g"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    restart: always
+
+networks:
+  elk:
+    driver: bridge
