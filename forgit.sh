@@ -8,7 +8,7 @@ echo "elasticsearch.password: changeme" >> ./kibana/config/kibana.yml
 # Configure Logstash
 sed -i '$d' ./logstash/config/logstash.yml
 echo "xpack.monitoring.elasticsearch.password: changeme" >> ./logstash/config/logstash.yml
-sed -i 's/password.*/password => changeme/g' ./logstash/pipeline/logstash.conf
+sed -i 's/password.*/password => "changeme"/g' ./logstash/pipeline/logstash.conf
 
 git add .
 git commit -m "Autocommit"
@@ -23,4 +23,4 @@ echo "elasticsearch.password:" $PASSWD >> ./kibana/config/kibana.yml
 # Configure Logstash
 sed -i '$d' ./logstash/config/logstash.yml
 echo "xpack.monitoring.elasticsearch.password:" $PASSWD >> ./logstash/config/logstash.yml
-sed -i "s/password.*/password => $PASSWD/g" ./logstash/pipeline/logstash.conf
+sed -i "s/password.*/password => \"$PASSWD\"/g" ./logstash/pipeline/logstash.conf
