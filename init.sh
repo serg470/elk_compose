@@ -1,7 +1,6 @@
-mc
 #!/bin/bash
 
-ELK_VERSION=7.2.0
+ELK_VERSION=7.3.2
 ELASTIC_DATA="/opt/data/elk/elasticsearch/data/"
 KIBANA_DATA="/opt/data/elk/kibana/data/"
 
@@ -46,7 +45,7 @@ fi
 docker-compose up -d
 
 # Generate Filebeat config
-touch /opt/elk/fb.conf
+touch fb.conf
 echo "output.elasticsearch:" > fb.conf
 echo " hosts: [\""$HOSTNAME".intertransl.com:9200\"]" >> fb.conf
 echo " username: \"elastic\"" >> fb.conf
