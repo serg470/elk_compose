@@ -7,14 +7,36 @@ KIBANA_DATA="/opt/data/elk/kibana/data/"
 docker-compose down
 #docker images -a | grep docker.elastic.co | awk '{print $3}' | xargs docker rmi
 
-# If ENV fies not exist wipe all data and create new credentials
-if [ ! -f .env ]; then
-    echo "ENV file does not exist"
-    touch .env
-# Genereate New Password
-    echo "ELASTIC_PASSWORD="`openssl rand -base64 21` > .env
-    echo "ELK_VERSION="$ELK_VERSION >> .env
+read -p "Dou you want to autogenerate password? (Y/N): " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+    if [ ! -f .env ]; then
+	# If ENV fies not exist wipe all data and create new credentials
+	echo "ENV file does not exist"
+	touch .env
+	# Genereate New Password
+	echo "ELASTIC_PASSWORD="`date +%s | sha256sum | base64 | head -c 21 ; echo` > .env
+	echo "ELK_VERSION="$ELK_VERSION >> .env
+	# Wipe Data For Elasticsearch
+	rm -r $ELASTIC_DATA
+    else
+	echo "Password alredy generated"
+    fi
+else
+    if [ ! -f .env ]; then
+	read -p "Enter new password: " password
+	echo "ELASTIC_PASSWORD="$password > .env
+	echo "ELK_VERSION="$ELK_VERSION >> .env
+	echo $password
+	# Wipe Data For Elasticsearch
+	rm -r $ELASTIC_DATA
+    else
+	echo "Password alredy generated"
+    fi
 fi
+
+# If ENV fies not exist wipe all data and create new credentials
 
 PASSWD=`head -n 1 .env | grep "=" | cut -d'=' -f2`
 # Configure Kibana
@@ -25,8 +47,6 @@ echo "elasticsearch.password:" $PASSWD >> ./kibana/config/kibana.yml
 sed -i '$d' ./logstash/config/logstash.yml
 echo "xpack.monitoring.elasticsearch.password:" $PASSWD >> ./logstash/config/logstash.yml
 sed -i "s/password.*/password => $PASSWD/g" ./logstash/pipeline/logstash.conf
-# Wipe Data For Elasticsearch
-rm -r $ELASTIC_DATA
 
 
 # Check Data Folder and Create If Not Exist
