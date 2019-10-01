@@ -1,3 +1,4 @@
+mc
 #!/bin/bash
 
 ELK_VERSION=7.2.0
@@ -46,10 +47,10 @@ docker-compose up -d
 
 # Generate Filebeat config
 touch /opt/elk/fb.conf
-echo "output.elasticsearch:" > /opt/elk/fb.conf
-echo " hosts: [\""$HOSTNAME".intertransl.com:9200\"]" >> /opt/elk/fb.conf
-echo " username: \"elastic\"" >> /opt/elk/fb.conf
-echo " password: "$(head -n 1 .env | grep "=" | cut -d'=' -f2) >> /opt/elk/fb.conf
-echo "setup.kibana:" >> /opt/elk/fb.conf
-echo " host: \""$HOSTNAME".intertransl.com:5601\"" >> /opt/elk/fb.conf
-echo " space.id: \"linux-servers\"" >> /opt/elk/fb.conf
+echo "output.elasticsearch:" > fb.conf
+echo " hosts: [\""$HOSTNAME".intertransl.com:9200\"]" >> fb.conf
+echo " username: \"elastic\"" >> fb.conf
+echo " password: "$(head -n 1 .env | grep "=" | cut -d'=' -f2) >> fb.conf
+echo "setup.kibana:" >> fb.conf
+echo " host: \""$HOSTNAME".intertransl.com:5601\"" >> fb.conf
+echo " space.id: \"linux-servers\"" >> fb.conf
